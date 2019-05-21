@@ -13,4 +13,6 @@ router.post('/login', authController.validateRequest('login'), authController.lo
 
 router.post('/register', authController.validateRequest('register'), authController.register);
 
+router.post('/verify', authController.validateRequest('verifyAccount'), authController.verifyAccount);
+
 module.exports = router;

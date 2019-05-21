@@ -6,6 +6,7 @@ const sendEmail = require('../helper/email');
 const crypto = require('crypto');
 const bcrypt = require('bcryptjs');
 const { body, validationResult } = require('express-validator/check');
+const shortid = require('shortid');
 
 
 exports.register = async (req, res) => {
@@ -24,12 +25,14 @@ exports.register = async (req, res) => {
 
         req.body.password = await bcrypt.hash(req.body.password, 8);
         let user = new User(req.body);
+
+        user.uniqueCode = shortid.generate();
+        user.IsVerified = false; // assert that it is false
+
         await user.save();
         user.password = undefined; // do not display hashed password in response body
-        let emailBody = {
-            
-        }
-        sendEmail.sendWelcome({ email });
+
+        sendEmail.sendVerificationCode({ email, code: user.uniqueCode });
 
         return status.responseBody(res, 200, { user }, undefined);
     } catch (error) {
@@ -51,6 +54,8 @@ exports.login = async (req, res) => {
         if (user) {
             let validPassword = await bcrypt.compare(password, user.password);
             if (validPassword) {
+                if (!user.IsVerified) return status.responseBody(res, 403, {}, 'Account not verified.');
+
                 crypto.pbkdf2(user.password, user.email, 10000, 64, 'sha512', (err, derivedKey) => {
                     if (error) throw error;
                     
@@ -66,6 +71,28 @@ exports.login = async (req, res) => {
         return status.responseBody(res, 500, {}, error.message);        
     }
 };
+
+exports.verifyAccount = async (req, res) => {
+    const errors = validationResult(req);
+    // validate the body
+    if (!errors.isEmpty()) {
+        return status.preconditionError(res, errors);
+    }
+
+    try {
+        let user = await User.findOne({ email: req.body.email });
+        if (user) {
+            if (req.body.verificationCode === user.uniqueCode) {
+                user.IsVerified = true;
+                return status.responseBody(res, 200, {}, 'Account has been verified. Login to start using ValtPass!');        
+            }
+            return status.responseBody(res, 403, {}, 'Invalid verification code.');        
+        }
+        return status.responseBody(res, 404, {}, 'An account with that email does not exist.');        
+    } catch (error) {
+
+    }
+}
 
 exports.logout = async function (req, res) {
 
@@ -113,6 +140,15 @@ exports.validateRequest = (validationType) => {
                     .isEmail().withMessage('Invalid Email.'),
                 body('password')
                     .exists().withMessage('Password Required.')
+            ]
+        }
+        case 'verifyAccount': {
+            return [
+                body('email')
+                    .exists().withMessage('Email Required.')
+                    .isEmail().withMessage('Invalid Email.'),
+                body('verificationCode')
+                    .exists().withMessage('Verification code required.')
             ]
         }
     }

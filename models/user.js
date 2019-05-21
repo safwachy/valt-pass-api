@@ -6,12 +6,7 @@ const UserSchema = new Schema({
     email: {
         type: String,
         required: true,
-        unique: true,
-        validate(value) {
-            if (!validator.isEmail(value)) {
-                throw new Error('Invalid email');
-            }
-        }
+        unique: true
     },
     password: {
         type: String,
@@ -25,10 +20,13 @@ const UserSchema = new Schema({
         type: Number,
         default: 1
     },
+    uniqueCode: String,  
+    AuthyID: String, // used for Authy 2FA API
     vaults: [{
         type: Schema.Types.ObjectId, 
         ref: 'Vault'
-    }]
+    }],
+    isVerified: Boolean
 }, { timestamps: true });
 
 const User = mongoose.model('User', UserSchema);

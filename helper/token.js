@@ -3,6 +3,8 @@ const crypto = require('crypto');
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 
+require('dotenv').config();
+
 const generateAuthToken = async (tokenPayload) => {
     const secret = process.env.SECRET;
     let options = { 

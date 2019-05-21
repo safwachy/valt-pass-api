@@ -5,7 +5,7 @@ const mongoose = require('mongoose');
 require('dotenv').config();
 
 // MongoDB
-const db = process.env.MONGODB_URL;
+const db = process.env.MONGODB_URL || 'mongodb://localhost:27017/ValtPass';
 mongoose.connect(db, { useNewUrlParser: true })
     .then(() => console.log('MongoDB Connected'))
     .catch((error) => console.log(error));
