@@ -13,20 +13,20 @@ const UserSchema = new Schema({
         required: true
     },
     phone: {
-        type: Number,
+        type: String,
         required: true
     },
     countryCode: {
         type: Number,
         default: 1
     },
-    uniqueCode: String,  
-    AuthyID: String, // used for Authy 2FA API
+    uniqueCode: String, // used to verify account after registration
+    authyID: String, // used for Authy 2FA API
     vaults: [{
         type: Schema.Types.ObjectId, 
         ref: 'Vault'
     }],
-    isVerified: Boolean
+    isVerified: { type: Boolean, default: false }
 }, { timestamps: true });
 
 const User = mongoose.model('User', UserSchema);

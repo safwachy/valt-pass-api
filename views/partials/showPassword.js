@@ -17,3 +17,5 @@ function showPassword(elementId) {
 		c.setAttribute("class","fas fa-eye-slash"); 
 	} 
 }; 
+
+module.exports = { showPassword };

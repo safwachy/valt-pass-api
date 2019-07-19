@@ -19,18 +19,6 @@ const generateAuthToken = async (tokenPayload) => {
     }
 };
 
-const validateToken = () => {
-
-};
-
-const validateUser = async (req, res, next) => {
-    let token =  req.headers['Auth'];
-    if (token) {
-        
-    }
-    return status.responseBody(res, 401, {}, 'Access token not found.');
-};
-
 module.exports = {
     generateAuthToken
 };

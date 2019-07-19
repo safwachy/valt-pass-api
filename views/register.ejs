@@ -51,11 +51,11 @@
         <div class="form-group">
           <label for="phone">Phone Number</label>
           <input
-            type="phone"
+            type="text"
             id="phone"
             name="phone"
             class="form-control"
-            placeholder="Phone Number"
+            placeholder="(555) 555-5555"
             value="<%= typeof phone != 'undefined' ? phone : null %>"
           />
         </div>
@@ -64,6 +64,7 @@
         </button>
       </form>
       <p class="lead mt-4">Have An Account? <a href="/users/login">Login</a></p>
+      
       <script type="text/javascript">
         function showPassword(elementId) { 
       	  let element = document.getElementById(elementId);
@@ -83,7 +84,13 @@
         		c.setAttribute("class","fas fa-eye-slash"); 
         	} 
         }; 
+
+        document.getElementById('phone').addEventListener('input', function (e) {
+          var x = e.target.value.replace(/\D/g, '').match(/(\d{0,3})(\d{0,3})(\d{0,4})/);
+          e.target.value = !x[2] ? x[1] : '(' + x[1] + ') ' + x[2] + (x[3] ? '-' + x[3] : '');
+        });
       </script>
+      
     </div>
   </div>
 </div>
