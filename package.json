@@ -19,7 +19,7 @@
     "express-validator": "^5.3.1",
     "jsonwebtoken": "^8.5.1",
     "moment": "^2.24.0",
-    "mongoose": "^5.4.20",
+    "mongoose": "^5.7.5",
     "shortid": "^2.2.14",
     "utf8": "^3.0.0",
     "validator": "^10.11.0"
