@@ -1,33 +1,31 @@
-const validator = require('validator');
 const mongoose = require('mongoose');
 const Schema = mongoose.Schema;
 
+const schemaOptions = {
+    collection: 'users',
+    timestamps: true
+};
+
 const UserSchema = new Schema({
-    email: {
-        type: String,
-        required: true,
-        unique: true
+    email: { type: String, required: true, unique: true },
+    password: { type: String, required: true },
+    phone: String,
+    countryCode: { type: String, default: '1' },
+
+    verificationData: { 
+        code: String,
+        timestamp: Date
     },
-    password: {
-        type: String,
-        required: true
-    },
-    phone: {
-        type: String,
-        required: true
-    },
-    countryCode: {
-        type: Number,
-        default: 1
-    },
-    uniqueCode: String, // used to verify account after registration
-    authyID: String, // used for Authy 2FA API
-    vaults: [{
-        type: Schema.Types.ObjectId, 
-        ref: 'Vault'
-    }],
-    isVerified: { type: Boolean, default: false }
-}, { timestamps: true });
+    isVerified: { type: Boolean, default: false },
+
+    authyId: String, // used for Authy 2FA API
+}, schemaOptions);
+
+UserSchema.virtual('vaultFolders', {
+    ref: 'VaultFolder',
+    localField: '_id',
+    foreignField: 'user'
+});
 
 const User = mongoose.model('User', UserSchema);
 

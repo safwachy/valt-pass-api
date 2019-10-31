@@ -1,30 +1,20 @@
 const User = require('../models/user');
 const { responseBody } = require('../helper/response');
-
-const crypto = require('crypto');
-const bcrypt = require('bcryptjs');
-const jwt = require('jsonwebtoken');
+const { decodeAuthToken } = require('../helper/token');
 
 require('dotenv').config();
 
-const validateToken = () => {
-
-};
+const crypto = require('crypto');
+const bcrypt = require('bcryptjs');
 
 const authenticate = async (req, res, next) => {
     try {
-        const token = req.headers['auth'];
-        if (!token) {
-            return responseBody(res, 401, {}, 'Access token not found.');
-        }
+        const decodedToken = await decodeAuthToken(req);
+        if (!decodedToken) return responseBody(res, 401, {}, 'Invalid Token.');  
+        if (!decodedToken.authy) return responseBody(res, 401, {}, '2FA Required.');
 
-        const secret = process.env.SECRET;
-        let decodedToken = await jwt.verify(token, secret);
-        if (!decodedToken) {
-            return responseBody(res, 401, {}, 'Invalid Token.');  
-        }
-
-        let user = await User.findById(decodedToken.id);
+        if (!decodedToken.id) return responseBody(res, 403, {}, 'Bad Token.');
+        const user = await User.findById(decodedToken.id);
         if (!user) {
             return responseBody(res, 401, {}, 'Trouble authenticating token.');  
         }
@@ -34,7 +24,7 @@ const authenticate = async (req, res, next) => {
 
         next();
     } catch (error) {
-        return responseBody(res, 500, {}, error.message);        
+        return responseBody(res, 500, {}, error);        
     }
 };
 
