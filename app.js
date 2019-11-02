@@ -20,4 +20,4 @@ app.use('/', require('./routes/index'));
 
 app.listen(port, () => {
     console.log(`Server is up on port ${port}`);
-});url
+});
