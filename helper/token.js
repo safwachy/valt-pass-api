@@ -9,8 +9,8 @@ require('dotenv').config();
 
 const generateAuthToken = async (tokenPayload) => {
     try {
-        // const privateKey = utf8.encode(process.env.PRIVATE_KEY);
-        const privateKey = fs.readFileSync('./private.key', 'utf8')
+        const privateKey = process.env.PRIVATE_KEY.replace(/\\n/g, '\n');
+        // const privateKey = fs.readFileSync('./private.key', 'utf8')
         const options = { 
             expiresIn: '1 hour',
             algorithm: 'RS256'
@@ -32,8 +32,8 @@ const decodeAuthToken = async req => {
             return responseBody(res, 401, {}, 'Access token not found.');
         }
 
-        // const publicKey = process.env.PUBLIC_KEY;
-        const publicKey = fs.readFileSync('./public.key', 'utf8')
+        const publicKey = process.env.PUBLIC_KEY.replace(/\\n/g, '\n');
+        // const publicKey = fs.readFileSync('./public.key', 'utf8')
 
         return jwt.verify(token, publicKey);
     } catch (error) {
