@@ -20,8 +20,8 @@ const VaultSchema = new Schema({
     contactName: String,
     email: String,
     phone: String,
-    countryCode: { type: Number, default: 1 },
-    birthday: Date,
+    countryCode: String,
+    birthday: String,
     contactNotes: String,
 
     // for notes data
