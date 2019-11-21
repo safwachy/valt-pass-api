@@ -4,9 +4,6 @@ const { decodeAuthToken } = require('../helper/token');
 
 require('dotenv').config();
 
-const crypto = require('crypto');
-const bcrypt = require('bcryptjs');
-
 const authenticate = async (req, res, next) => {
     try {
         const decodedToken = await decodeAuthToken(req);
