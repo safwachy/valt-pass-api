@@ -6,7 +6,7 @@ const responseBody = (responseObject, statusCode, data, message) => {
 
 const preconditionError = (responseObject, errors) => {
     const errorMessage = errors.array()[0].msg; // print the first error message
-    return responseBody(responseObject, 412, {}, errorMessage);
+    return responseBody(responseObject, 428, {}, errorMessage);
 }
 
 module.exports = {

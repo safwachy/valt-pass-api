@@ -21,8 +21,8 @@ exports.register = async (req, res) => {
     try {
         const { email, phone } = req.body;
         const [locatedEmail, locatedPhone] = await Promise.all([
-            User.findOne({ email }),
-            User.findOne({ phone }),
+            User.findOne({ email }).lean(),
+            User.findOne({ phone }).lean(),
         ]);
         if (locatedEmail) return status.responseBody(res, 409, {}, 'Email is already in use');
         if (locatedPhone) return status.responseBody(res, 409, {}, 'Phone number is already in use');
@@ -40,7 +40,6 @@ exports.register = async (req, res) => {
 
         return status.responseBody(res, 200, { user: user._id }, undefined);
     } catch (error) {
-        console.log(error)
         return status.responseBody(res, 500, {}, error.message);
     }
 };
