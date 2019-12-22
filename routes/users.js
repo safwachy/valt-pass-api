@@ -21,7 +21,6 @@ router.get('/:id/folders', authenticate, folderController.validateRequest('readA
 
 // Vault Enpoints
 router.post('/:id/vaults', authenticate, vaultController.validateRequest('create'), vaultController.create);
-router.get('/:id/vaults/:vaultId', authenticate, vaultController.validateRequest('read'), vaultController.read);
 router.patch('/:id/vaults/:vaultId', authenticate, vaultController.validateRequest('update'), vaultController.update);
 router.delete('/:id/vaults/:vaultId', authenticate, vaultController.validateRequest('delete'), vaultController.delete);
 

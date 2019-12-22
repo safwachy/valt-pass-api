@@ -1,6 +1,6 @@
 const Vault = require('../models/vault');
 const status = require('../helper/response');
-const { encryptVault, decryptVault } = require('../helper/encrypt');
+const { encryptVault } = require('../helper/encrypt');
 
 const { body, param, validationResult } = require('express-validator/check');
 
@@ -46,23 +46,43 @@ exports.create = async (req, res) => {
 	}
 };
 
-exports.read = async (req, res) => {
-	try {
-        const errors = validationResult(req);
-        if (!errors.isEmpty()) return status.preconditionError(res, errors);
-        
-
-	} catch (error) {
-		return status.responseBody(res, 500, {}, error.message);        
-	}
-};
-
 exports.update = async (req, res) => {
 	try {
         const errors = validationResult(req);
         if (!errors.isEmpty()) return status.preconditionError(res, errors);
         
+        const { id, vaultId } = req.params;
 
+		if (req.user != id) return status.responseBody(res, 401, {}, 'Unauthorized user');
+        if (!req.key) return status.responseBody(res, 403, {}, 'Encryption key not found');
+        
+        let vaultBody = {};
+        
+        if (req.body.folder) vaultBody.folder = req.body.folder;
+        if (req.body.title) vaultBody.title = req.body.title;
+        if (req.body.website) vaultBody.website = req.body.website;
+        if (req.body.username) vaultBody.username = req.body.username;
+        if (req.body.password) vaultBody.password = req.body.password;
+        if (req.body.contactName) vaultBody.contactName = req.body.contactName;
+        if (req.body.email) vaultBody.email = req.body.email;
+        if (req.body.phone) vaultBody.phone = req.body.phone;
+        if (req.body.countryCode) vaultBody.countryCode = req.body.countryCode;
+        if (req.body.birthday) vaultBody.birthday = req.body.birthday;
+        if (req.body.contactNotes) vaultBody.contactNotes = req.body.contactNotes;
+        if (req.body.notes) vaultBody.notes = req.body.notes;
+
+        const encryptedVaultBody = await encryptVault(vaultBody, req.key);
+        const updatedVault = await Vault.findByIdAndUpdate(vaultId, { $set: encryptedVaultBody }, { new: true }).lean();
+
+        if (updatedVault) {
+            // the encrypted doc should not be sent back
+            const returnBody = {
+                _id: updatedVault._id,
+                type: updatedVault.type,
+                ...vaultBody,
+            };
+			return status.responseBody(res, 200, { vault: returnBody }, undefined);
+        }
 	} catch (error) {
 		return status.responseBody(res, 500, {}, error.message);        
 	}
@@ -73,7 +93,11 @@ exports.delete = async (req, res) => {
         const errors = validationResult(req);
         if (!errors.isEmpty()) return status.preconditionError(res, errors);
         
+        const { id, vaultId } = req.params;
 
+        if (req.user != id) return status.responseBody(res, 401, {}, 'Unauthorized user');
+        const deletedVault = Vault.findByIdAndRemove(vaultId);
+        if (deletedVault) return status.responseBody(res, 200, {}, undefined);
 	} catch (error) {
 		return status.responseBody(res, 500, {}, error.message);        
 	}
@@ -100,14 +124,6 @@ exports.validateRequest = validationType => {
                     .exists().withMessage('Vault Folder Id required')
             ]
 		}
-		case 'read': {
-			return [
-				param('id')
-					.exists().withMessage('User Id Required'),
-                param('vaultId')
-                    .exists().withMessage('Vault Id Required'),
-			]
-        }
         case 'update': {
             return [
                 param('id')

@@ -12,10 +12,6 @@ const UserSchema = new Schema({
     phone: { type: Number, required: true, unique: true},
     countryCode: { type: String, default: '1' },
 
-    securityData: {
-        question: String,
-        answer: String,
-    },
     verificationData: { 
         code: String,
         timestamp: Date

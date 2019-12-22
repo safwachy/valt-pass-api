@@ -29,7 +29,7 @@ exports.readAll = async (req, res) => {
 		for (let i = 0; i < folders.length; i++) {
 			if (folders[i].vaults && folders[i].vaults.length) {
 				for (let k = 0; k < folders[i].vaults.length; k++) {
-					decryptPromiseArr.push(decryptVault(folders[i].vaults[k], key).catch(error => console.log(error)));
+					decryptPromiseArr.push(decryptVault(folders[i].vaults[k], key).catch(error => console.err(error)));
 				}
 				decryptedVaults = await Promise.all(decryptPromiseArr);
 				folders[i].vaults = decryptedVaults;

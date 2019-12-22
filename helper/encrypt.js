@@ -1,6 +1,7 @@
 // Nodejs encryption with CTR
 const crypto = require('crypto');
 
+// Will only encrypt single string value
 const encrypt = (text, key) => {
 	return new Promise((resolve, reject) => {
 		try {
@@ -16,7 +17,8 @@ const encrypt = (text, key) => {
 		}
 	});
 };
-   
+
+// Will only decrypt single string value
 const decrypt = (text, key) => {
 	return new Promise((resolve, reject) => {
 		try {

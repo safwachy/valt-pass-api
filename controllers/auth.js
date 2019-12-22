@@ -1,4 +1,5 @@
 const User = require('../models/user');
+const VaultFolder = require('../models/vaultFolder');
 const status = require('../helper/response');
 const token = require('../helper/token');
 const sendEmail = require('../helper/email');
@@ -32,7 +33,7 @@ exports.register = async (req, res) => {
 
         user.verificationData = {
             code: shortid.generate(),
-            timestamp: new Date()
+            timestamp: new Date(),
         };
         
         await user.save();
@@ -43,11 +44,6 @@ exports.register = async (req, res) => {
         return status.responseBody(res, 500, {}, error.message);
     }
 };
-
-// In case user needs to request a new authy sms token
-exports.sendSmsToken = async (req, res) => {
-
-}
 
 // first step for login: basic user and password verification
 exports.login = async (req, res) => {
@@ -160,10 +156,17 @@ exports.verifyAccount = async (req, res) => {
             phone: phoneString
         });
 
+        const defaultFolder = new VaultFolder({
+            user: user._id,
+            name: 'None',
+        });
+
         user.countryCode = undefined;
         user.authyId = authyRes.user.id;
         user.isVerified = true;
+        
         await user.save();
+        await defaultFolder.save();
 
         return status.responseBody(res, 200, {}, undefined); 
     } catch (error) {
@@ -171,37 +174,37 @@ exports.verifyAccount = async (req, res) => {
     }
 }
 
-exports.changePasswordRequest = async function (req, res) {
-    const errors = validationResult(req);
-    if (!errors.isEmpty()) return status.preconditionError(res, errors);
+// exports.changePasswordRequest = async function (req, res) {
+//     const errors = validationResult(req);
+//     if (!errors.isEmpty()) return status.preconditionError(res, errors);
 
-    try {
-        const { email } = req.body;
-        const update = {
-            code: shortid.generate(),
-            timestamp: new Date()   
-        };
-        const user = User.findOneAndUpdate({ email }, { verificationData: update });
+//     try {
+//         const { email } = req.body;
+//         const update = {
+//             code: shortid.generate(),
+//             timestamp: new Date()   
+//         };
+//         const user = User.findOneAndUpdate({ email }, { verificationData: update });
 
-        if (user) sendEmail.sendPasswordChange(email, update.code);
+//         if (user) sendEmail.sendPasswordChange(email, update.code);
 
-        return status.responseBody(res, 200, {}, undefined); 
-    } catch (error) {
-        return status.responseBody(res, 500, {}, error.message);
-    }
-};
+//         return status.responseBody(res, 200, {}, undefined); 
+//     } catch (error) {
+//         return status.responseBody(res, 500, {}, error.message);
+//     }
+// };
 
 // data encryption key will change with new master password
-exports.changePassword = async function (req, res) {
-    const errors = validationResult(req);
-    if (!errors.isEmpty()) return status.preconditionError(res, errors);
+// exports.changePassword = async function (req, res) {
+//     const errors = validationResult(req);
+//     if (!errors.isEmpty()) return status.preconditionError(res, errors);
 
-    try {
+//     try {
         
-    } catch (error) {
-        return status.responseBody(res, 500, {}, error.message);
-    }
-}
+//     } catch (error) {
+//         return status.responseBody(res, 500, {}, error.message);
+//     }
+// }
 
 exports.validateRequest = validationType => {
     const numberRegex = new RegExp('^(?=.*[0-9])');
@@ -231,7 +234,7 @@ exports.validateRequest = validationType => {
                     }),
                 body('phone')
                     .exists().withMessage('Phone number required.')
-                    .isMobilePhone('en-CA').withMessage('Invalid format for phone number.')
+                    .isNumeric().withMessage('Must be in number format')
             ]
         }
         case 'login': {
