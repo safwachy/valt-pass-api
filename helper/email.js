@@ -31,33 +31,6 @@ const sendVerificationCode = (email, code) => {
     sgMail.send(msg);
 };
 
-const sendNewPassword = (body) => {
-
-};
-
-const requestPasswordChange = (email, code) => {
-    let html = `
-    <tr style="margin: 0; padding: 0; font-family: Helvetica; box-sizing: border-box; font-size: 14px;">
-        <td class="content-block" style="margin: 0; padding: 0 0 20px; font-family: Helvetica; box-sizing: border-box; font-size: 14px; vertical-align: top;">
-            <p>A request has been made to change your master password.</p>
-
-            <p>Please use the following code to verify that this is you: ${code}</p>
-            
-            <p>If this was not you, please login to your account and change your master password</p>
-        </td>
-    </tr>`;
-
-const msg = {
-    to: email,
-    from: 'safwachyece@gmail.com',
-    subject: 'ValtPass Master Password Change',
-    html,
-};
-sgMail.send(msg);
-}
-
 module.exports = {
     sendVerificationCode,
-    requestPasswordChange,
-    sendNewPassword
 };

@@ -9,7 +9,7 @@ const schemaOptions = {
 const UserSchema = new Schema({
     email: { type: String, required: true, unique: true },
     password: { type: String, required: true },
-    phone: String,
+    phone: { type: Number, required: true, unique: true},
     countryCode: { type: String, default: '1' },
 
     verificationData: { 

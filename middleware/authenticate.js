@@ -4,13 +4,10 @@ const { decodeAuthToken } = require('../helper/token');
 
 require('dotenv').config();
 
-const crypto = require('crypto');
-const bcrypt = require('bcryptjs');
-
 const authenticate = async (req, res, next) => {
     try {
         const decodedToken = await decodeAuthToken(req);
-        if (!decodedToken) return responseBody(res, 401, {}, 'Invalid Token.');  
+        if (!decodedToken || decodedToken instanceof Error) return responseBody(res, 401, {}, 'Invalid auth token, please login.');  
         if (!decodedToken.authy) return responseBody(res, 401, {}, '2FA Required.');
 
         if (!decodedToken.id) return responseBody(res, 403, {}, 'Bad Token.');
