@@ -9,6 +9,7 @@ const schemaOptions = {
 const VaultSchema = new Schema({
     user: { type: Schema.Types.ObjectId, ref: 'User' },
     folder: { type: Schema.Types.ObjectId, ref: 'VaultFolder' },
+    type: { type: 'String', enum: ['password', 'contact', 'notes'] },
     title: String,
 
     // for website credential data
