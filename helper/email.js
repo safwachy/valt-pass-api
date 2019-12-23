@@ -33,6 +33,4 @@ const sendVerificationCode = (email, code) => {
 
 module.exports = {
     sendVerificationCode,
-    requestPasswordChange,
-    sendNewPassword
 };

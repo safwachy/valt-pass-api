@@ -1,6 +1,6 @@
 const Vault = require('../models/vault');
 const status = require('../helper/response');
-const { encryptVault } = require('../helper/encrypt');
+const { encryptVault, decryptVault } = require('../helper/encrypt');
 
 const { body, param, validationResult } = require('express-validator/check');
 
@@ -58,7 +58,6 @@ exports.update = async (req, res) => {
         
         let vaultBody = {};
         
-        if (req.body.folder) vaultBody.folder = req.body.folder;
         if (req.body.title) vaultBody.title = req.body.title;
         if (req.body.website) vaultBody.website = req.body.website;
         if (req.body.username) vaultBody.username = req.body.username;
@@ -72,16 +71,14 @@ exports.update = async (req, res) => {
         if (req.body.notes) vaultBody.notes = req.body.notes;
 
         const encryptedVaultBody = await encryptVault(vaultBody, req.key);
+        if (!encryptedVaultBody) throw new Error('Could not encrypt document');
+        
         const updatedVault = await Vault.findByIdAndUpdate(vaultId, { $set: encryptedVaultBody }, { new: true }).lean();
-
         if (updatedVault) {
-            // the encrypted doc should not be sent back
-            const returnBody = {
-                _id: updatedVault._id,
-                type: updatedVault.type,
-                ...vaultBody,
-            };
-			return status.responseBody(res, 200, { vault: returnBody }, undefined);
+            const decryptedVault = await decryptVault(updatedVault, req.key);
+            if (!decryptedVault) throw new Error('Could not encrypt document');
+
+            return status.responseBody(res, 200, { vault: decryptedVault }, 'Update successful');
         }
 	} catch (error) {
 		return status.responseBody(res, 500, {}, error.message);        
@@ -96,7 +93,7 @@ exports.delete = async (req, res) => {
         const { id, vaultId } = req.params;
 
         if (req.user != id) return status.responseBody(res, 401, {}, 'Unauthorized user');
-        const deletedVault = Vault.findByIdAndRemove(vaultId);
+        const deletedVault = await Vault.findByIdAndRemove(vaultId);
         if (deletedVault) return status.responseBody(res, 200, {}, undefined);
 	} catch (error) {
 		return status.responseBody(res, 500, {}, error.message);        

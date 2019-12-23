@@ -2,7 +2,7 @@ const VaultFolder = require('../models/vaultFolder');
 const status = require('../helper/response');
 const { decryptVault } = require('../helper/encrypt');
 
-const { body, param, validationResult } = require('express-validator/check');
+const { body, param, query, validationResult } = require('express-validator/check');
 
 exports.readAll = async (req, res) => {
 	try {

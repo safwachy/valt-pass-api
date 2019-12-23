@@ -168,43 +168,11 @@ exports.verifyAccount = async (req, res) => {
         await user.save();
         await defaultFolder.save();
 
-        return status.responseBody(res, 200, {}, undefined); 
+        return status.responseBody(res, 200, {}, 'Successfully verified, please login to use your account'); 
     } catch (error) {
         return status.responseBody(res, 500, {}, error.message);        
     }
 }
-
-// exports.changePasswordRequest = async function (req, res) {
-//     const errors = validationResult(req);
-//     if (!errors.isEmpty()) return status.preconditionError(res, errors);
-
-//     try {
-//         const { email } = req.body;
-//         const update = {
-//             code: shortid.generate(),
-//             timestamp: new Date()   
-//         };
-//         const user = User.findOneAndUpdate({ email }, { verificationData: update });
-
-//         if (user) sendEmail.sendPasswordChange(email, update.code);
-
-//         return status.responseBody(res, 200, {}, undefined); 
-//     } catch (error) {
-//         return status.responseBody(res, 500, {}, error.message);
-//     }
-// };
-
-// data encryption key will change with new master password
-// exports.changePassword = async function (req, res) {
-//     const errors = validationResult(req);
-//     if (!errors.isEmpty()) return status.preconditionError(res, errors);
-
-//     try {
-        
-//     } catch (error) {
-//         return status.responseBody(res, 500, {}, error.message);
-//     }
-// }
 
 exports.validateRequest = validationType => {
     const numberRegex = new RegExp('^(?=.*[0-9])');
@@ -234,7 +202,7 @@ exports.validateRequest = validationType => {
                     }),
                 body('phone')
                     .exists().withMessage('Phone number required.')
-                    .isNumeric().withMessage('Must be in number format')
+                    .isMobilePhone('en-CA').withMessage('Invalid format for phone number.')
             ]
         }
         case 'login': {

@@ -23,8 +23,8 @@ const decrypt = (text, key) => {
 	return new Promise((resolve, reject) => {
 		try {
 			let textParts = text.split(':');
-			const iv = Buffer.from(textParts.shift(), 'hex');
-			let encryptedText = Buffer.from(textParts.join(':'), 'hex');
+			const iv = Buffer.from(textParts[0], 'hex');
+			let encryptedText = Buffer.from(textParts[1], 'hex');
 			let decipher = crypto.createDecipheriv('aes-256-cbc', Buffer.from(key), iv);
 			let decrypted = decipher.update(encryptedText);
 		
@@ -40,18 +40,25 @@ const decrypt = (text, key) => {
 // Only regular string fields will be encrypted/decrypted
 // functions will ignore fields that should not be affected
 const encryptVault = (doc, secretKey) => {
-	return new Promise((resolve, reject) => {
+	return new Promise(async (resolve, reject) => {
 		try {
 			let untouchedInfo = {};
+			if (doc._id) untouchedInfo._id = doc._id;
+			if (doc.createdAt) untouchedInfo.createdAt = doc.createdAt;
+			if (doc.updatedAt) untouchedInfo.updatedAt = doc.updatedAt;
 			if (doc.user) untouchedInfo.user = doc.user;
 			if (doc.folder) untouchedInfo.folder = doc.folder;
 			if (doc.type) untouchedInfo.type = doc.type;
+			delete doc._id;
+			delete doc.createdAt;
+			delete doc.updatedAt;
 			delete doc.user;
 			delete doc.folder;
 			delete doc.type;
-	
+			delete doc.__v;
+
 			let encryptedDoc = { ...doc };
-			
+
 			const docKeys = Object.keys(doc);
 			const promiseArr = docKeys.map(field => encrypt(doc[field], secretKey) );
 			const docEncryptedValues = await Promise.all(promiseArr.map(promise => promise.catch(error => console.log(error))));
@@ -67,15 +74,22 @@ const encryptVault = (doc, secretKey) => {
 };
 
 const decryptVault = (doc, secretKey) => {
-	return new Promise((resolve, reject) => {
+	return new Promise(async (resolve, reject) => {
 		try {
 			let untouchedInfo = {};
+			if (doc._id) untouchedInfo._id = doc._id;
+			if (doc.createdAt) untouchedInfo.createdAt = doc.createdAt;
+			if (doc.updatedAt) untouchedInfo.updatedAt = doc.updatedAt;
 			if (doc.user) untouchedInfo.user = doc.user;
 			if (doc.folder) untouchedInfo.folder = doc.folder;
 			if (doc.type) untouchedInfo.type = doc.type;
+			delete doc._id;
+			delete doc.createdAt;
+			delete doc.updatedAt;
 			delete doc.user;
 			delete doc.folder;
 			delete doc.type;
+			delete doc.__v;
 
 			let decryptedDoc = { ...doc };
 
