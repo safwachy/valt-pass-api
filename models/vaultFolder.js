@@ -2,7 +2,7 @@ const mongoose = require('mongoose');
 const Schema = mongoose.Schema;
 
 const schemaOptions = {
-	collection: 'vaultFolders',
+	collection: 'vaultfolders',
 	timestamps: true
 };
 

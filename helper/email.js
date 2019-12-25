@@ -11,8 +11,6 @@ const sendVerificationCode = (email, code) => {
                 <p>Your ValtPass account has been created successfully!</p>
                 <p>Here is your verification code: ${code}.</p>
                 <p>**DO NOT LOSE THIS CODE OR SHARE IT WITH ANYONE**</p>
-
-                <p>If you accidentally lost access to the verification page, don't worry! Just login with your credentials and if your account isn't verified, it will bring you back to the same page.</p>
                                                                     
                 <p>Thank you for supporting my project!</p>
 

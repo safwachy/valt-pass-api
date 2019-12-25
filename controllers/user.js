@@ -36,7 +36,7 @@ exports.delete = async (req, res) => {
             VaultFolder.deleteMany({ user: id }),
             User.findByIdAndRemove(id)
         ]);
-        return status.responseBody(res, 200, {}, undefined);
+        return status.responseBody(res, 200, {}, 'User deleted');
     } catch (error) {
         return status.responseBody(res, 500, {}, error.message);        
     }

@@ -21,7 +21,7 @@ const UserSchema = new Schema({
     authyId: String, // used for Authy 2FA API
 }, schemaOptions);
 
-UserSchema.virtual('vaultFolders', {
+UserSchema.virtual('vaultfolders', {
     ref: 'VaultFolder',
     localField: '_id',
     foreignField: 'user'

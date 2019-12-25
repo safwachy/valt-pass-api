@@ -15,6 +15,11 @@ exports.create = async (req, res) => {
 		if (req.user != id) return status.responseBody(res, 401, {}, 'Unauthorized user');
 		if (!req.key) return status.responseBody(res, 403, {}, 'Encryption key not found');
 
+        if (!folder) {
+            const defaultFolder = await VaultFolder.findOne({ user: id, name: 'None' }).lean();
+            folder = defaultFolder._id;
+        }
+
         let vaultBody = {
             user: id,
             folder,
@@ -35,7 +40,7 @@ exports.create = async (req, res) => {
 
         const encryptedVaultBody = await encryptVault(vaultBody, req.key);
         const newVault = new Vault(encryptedVaultBody);
-        await newVault.save();
+        newVault.save();
         if (newVault) {
             // the encrypted doc should not be sent back
 			return status.responseBody(res, 200, { vault: { _id: newVault._id , ...vaultBody } }, undefined);
@@ -58,6 +63,7 @@ exports.update = async (req, res) => {
         
         let vaultBody = {};
         
+        if (req.body.type) vaultBody.type = req.body.type;
         if (req.body.title) vaultBody.title = req.body.title;
         if (req.body.website) vaultBody.website = req.body.website;
         if (req.body.username) vaultBody.username = req.body.username;
@@ -94,7 +100,7 @@ exports.delete = async (req, res) => {
 
         if (req.user != id) return status.responseBody(res, 401, {}, 'Unauthorized user');
         const deletedVault = await Vault.findByIdAndRemove(vaultId);
-        if (deletedVault) return status.responseBody(res, 200, {}, undefined);
+        if (deletedVault) return status.responseBody(res, 200, {}, 'Vault document deleted successfully');
 	} catch (error) {
 		return status.responseBody(res, 500, {}, error.message);        
 	}
@@ -109,16 +115,13 @@ exports.validateRequest = validationType => {
                 body('type')
 					.exists().withMessage('Vault type required')
 					.custom(value => {
-						if (value === 'all') return true;
-						else if (value === 'password') return true;
+						if (value === 'password') return true;
 						else if (value === 'contact') return true;
 						else if (value === 'notes') return true;
 						else {
-							throw new Error('Invalid vault type');
+							throw new Error('Invalid string enumerator for \'type\'');
 						}
                     }),
-                body('folder')
-                    .exists().withMessage('Vault Folder Id required')
             ]
 		}
         case 'update': {
@@ -127,6 +130,17 @@ exports.validateRequest = validationType => {
                     .exists().withMessage('User Id Required'),
                 param('vaultId')
                     .exists().withMessage('Vault Id Required'),
+                body('type')
+                    .custom(value => {
+                        if (type) {
+                            if (value === 'password') return true;
+                            else if (value === 'contact') return true;
+                            else if (value === 'notes') return true;
+                            else {
+                                throw new Error('Invalid string enumerator for \'type\'');
+                            }
+                        }
+                    }),
             ]
         }
         case 'delete': {

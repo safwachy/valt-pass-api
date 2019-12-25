@@ -39,7 +39,7 @@ exports.register = async (req, res) => {
         await user.save();
         sendEmail.sendVerificationCode(email, user.verificationData.code);
 
-        return status.responseBody(res, 200, { user: user._id }, undefined);
+        return status.responseBody(res, 200, { user: user._id }, 'Successfully registered, please check your email');
     } catch (error) {
         return status.responseBody(res, 500, {}, error.message);
     }
@@ -112,6 +112,12 @@ exports.loginComplete = async (req, res) => {
 
         if (!authyRes) return status.responseBody(res, 401, {}, 'Error in validating SMS token.');
 
+        user.verificationData = {
+            code: shortid.generate(),
+            timestamp: new Date()
+        };
+        user.save();
+        
         const tokenPayload = { 
             key: decodedToken.key,
             id: decodedToken.id,
@@ -134,7 +140,8 @@ exports.verifyAccount = async (req, res) => {
         const code = req.body.verificationCode;
         let user = await User.findById(req.params.id, 'email countryCode phone verificationData isVerified');
 
-        if (!user) return status.responseBody(res, 404, {}, 'User not found.'); 
+        if (!user) return status.responseBody(res, 404, {}, 'User not found.');
+        if (user.isVerified) return status.responseBody(res, 403, {}, 'User is already verified.');
         if (code !== user.verificationData.code) return status.responseBody(res, 403, {}, 'Invalid verification code.');
 
         const codeDate = moment(user.verificationData.timestamp);
@@ -161,12 +168,16 @@ exports.verifyAccount = async (req, res) => {
             name: 'None',
         });
 
+        user.verificationData = {
+            code: shortid.generate(),
+            timestamp: new Date()
+        };
         user.countryCode = undefined;
         user.authyId = authyRes.user.id;
         user.isVerified = true;
         
-        await user.save();
-        await defaultFolder.save();
+        user.save();
+        defaultFolder.save();
 
         return status.responseBody(res, 200, {}, 'Successfully verified, please login to use your account'); 
     } catch (error) {
