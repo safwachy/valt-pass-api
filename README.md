@@ -1,8 +1,8 @@
 # ValtPass Web API
 
-An open sourced REST API for a password manager web application which utilises end-to-end encryption so that you're the only one with full control over your data!
+An open sourced REST API for a password manager web application.
 
-The API is written in Node.js and uses MongoDB.
+This backend API is written is Node.js and utillises MongoDB, two-factor authentication (2FA) as well as end-to-end encryption so that you're the only one with full control over your data!
 
 ## Table of Contents
 - [Usage](#usage)
@@ -15,8 +15,8 @@ The API is written in Node.js and uses MongoDB.
 
 All resources are broken down into three collections.
 - Users: contains your basic login credentials as well as other security parameters
-- Vault Folders: organizes all of your passwords into folders
-- Vaults: The actual document that contains your password data you choose to store as well as any other info like contact info or any notes you'd like to save
+- Vault Folders: organizes all of your data into folders
+- Vaults: The document which stores any website/application credentials. This can also store other info such as contact info or any notes you'd like to save
 
 List of all endpoints:
 
@@ -41,7 +41,7 @@ PATCH /users/:id/vaults/:vaultId
 DELETE /users/:id/vaults/:vaultId
 ```
 
-If you would like to test out this API yourself, you can make http requests to the following base URL:
+If you would like to test this API yourself, you can make http requests to the following base URL:
 
 > https://valt-pass-api.herokuapp.com
 
@@ -56,7 +56,7 @@ ValtPass uses Twilio Authy two-factor authentication to ensure that your data st
 - Accepted Body Parameters:
     > email: String (Required)
     
-    > password: String (Required) (Must be 10+ characters, 1+ uppercase letter, 1+ lowercase letter, 1+ number and 1+ special character
+    > password: String (Required) (Must have 10+ characters, 1+ uppercase letter, 1+ lowercase letter, 1+ number and 1+ special character)
     
     > confirmPassword: String (Required) (Must be the same as password)
     
@@ -81,7 +81,7 @@ ValtPass uses Twilio Authy two-factor authentication to ensure that your data st
 ### PATCH /users/:id/verify 
 - verify your email/account
 - Accepted Body Parameters:
-    > verificationCode: String (Required) (code sent to your email)
+    > verificationCode: String (Required) (The code sent to your email)
 
 ```js
 // Request Params: use the user id returned to you from /register
@@ -127,10 +127,10 @@ auth: eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9.eyJrZXkiOiI4YjdkYWUzNDQzMTkzZDYwMTRkZ
 ```
 - If successful, the auth token will be modified to conifirm that you have completed the 2FA process
 - NOTE: The auth token expires after 30 mins, so in other words, you will be logged in for 30 mins at a maximum
-- Accepted Body Parameters:
+- Accepted Body Parameters: (to prove that you are who you say you are)
     > smsToken: Number (Required)
     
-    > verificationCode: String (Required) (Code from response body of POST /login)
+    > verificationCode: String (Required) (The code from the response body of POST /login)
 
 ```js
 // Sample Request Body
@@ -146,7 +146,7 @@ auth: eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9.eyJrZXkiOiI4YjdkYWUzNDQzMTkzZDYwMTRkZ
     }
 }
 ``` 
-- Don't forget to use your updated auth token as a request header for the rest of the requests
+- Don't forget to use your NEW auth token as a request header for the rest of the requests
 
 ## User Routes
 
