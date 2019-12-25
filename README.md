@@ -53,8 +53,14 @@ ValtPass uses Twilio Authy two-factor authentication to ensure that your data st
 ### POST /register
 - Register an account with ValtPass
 - After registering, an email will be sent to the email address with a code so that you can verify your account
-- Note: ValtPass only accepts passwords with at least 10 characters, 1 uppercase letter, 1 lowercase letter, 1 number and 1 special character
-- As of right now, ValtPass only accepts North American phone numbers
+- Accepted Body Parameters:
+    > email: String (Required)
+    
+    > password: String (Required) (Must be 10+ characters, 1+ uppercase letter, 1+ lowercase letter, 1+ number and 1+ special character
+    
+    > confirmPassword: String (Required) (Must be the same as password)
+    
+    > phone: Number (Required) (Only North American numbers accepted as of right now)
 ```js
 // Sample Request body
 {
@@ -74,6 +80,8 @@ ValtPass uses Twilio Authy two-factor authentication to ensure that your data st
 
 ### PATCH /users/:id/verify 
 - verify your email/account
+- Accepted Body Parameters:
+    > verificationCode: String (Required) (code sent to your email)
 
 ```js
 // Request Params: use the user id returned to you from /register
@@ -92,7 +100,10 @@ ValtPass uses Twilio Authy two-factor authentication to ensure that your data st
 ### POST /login 
 - Since ValtPass uses 2FA there are two routes for the login process this is the first
 - If the request succeeds, a code will be sent to your phone via SMS, this should be used for the next route
-
+- Accepted Body Parameters:
+    > email: String (Required)
+    
+    > password: String (Required)
 ```js
 // Sample Request Body
 {
@@ -114,15 +125,18 @@ ValtPass uses Twilio Authy two-factor authentication to ensure that your data st
 ```
 auth: eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9.eyJrZXkiOiI4YjdkYWUzNDQzMTkzZDYwMTRkZjI2MDc2MzE2NTFiNyIsImlkIjoiNWRmZmYyODliMTM2MjEwYTg3ZTlhMDliIiwiaWF0IjoxNTc3MDU4OTg4LCJleHAiOjE1NzcwNjI1ODh9.L1EJj9RHaFvMAAmh0qYEl12lPsb0eZZVqtCiKnIcnH292pVN9spiR9QMkq0L8DV_aN12_qdnChbGSPxN0lyccw
 ```
-- This route accepts the code from the response body of POST /login and the SMS token sent to you to confirm that you are who you say you are
 - If successful, the auth token will be modified to conifirm that you have completed the 2FA process
 - NOTE: The auth token expires after 30 mins, so in other words, you will be logged in for 30 mins at a maximum
+- Accepted Body Parameters:
+    > smsToken: Number (Required)
+    
+    > verificationCode: String (Required) (Code from response body of POST /login)
 
 ```js
 // Sample Request Body
 {
-    smsTken: '880634',
-    password: 'JsEvEiuOx'
+    smsToken: '880634',
+    verificationCode: 'JsEvEiuOx'
 }
 
 // Sample Response Body
@@ -170,7 +184,7 @@ auth: eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9.eyJrZXkiOiI4YjdkYWUzNDQzMTkzZDYwMTRkZ
 
 ### POST /users/:id/folders
 - Create a folder to hold vault documents
-- Accepted Body Values: 
+- Accepted Body Parameters: 
     > name: String (Required)
 ```js
 // Request Params: use your user id
