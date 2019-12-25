@@ -100,8 +100,8 @@ exports.loginComplete = async (req, res) => {
         } = req.body
 
         const decodedToken = await token.decodeAuthToken(req);
-        if (!decodedToken) return responseBody(res, 401, {}, 'Invalid Token.');  
-        if (!decodedToken.id) return responseBody(res, 403, {}, 'Bad Token.');
+        if (!decodedToken) return status.responseBody(res, 401, {}, 'Invalid Token.');  
+        if (!decodedToken.id) return status.responseBody(res, 403, {}, 'Bad Token.');
 
         const user = await User.findById(decodedToken.id, 'password isVerified authyId verificationData');
 
@@ -128,6 +128,7 @@ exports.loginComplete = async (req, res) => {
 
         return status.responseBody(res, 200, { authToken: newAuthToken }, undefined);   
     } catch (error) {
+
         return status.responseBody(res, 500, {}, error.message);        
     }
 }

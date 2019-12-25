@@ -130,17 +130,6 @@ exports.validateRequest = validationType => {
                     .exists().withMessage('User Id Required'),
                 param('vaultId')
                     .exists().withMessage('Vault Id Required'),
-                body('type')
-                    .custom(value => {
-                        if (type) {
-                            if (value === 'password') return true;
-                            else if (value === 'contact') return true;
-                            else if (value === 'notes') return true;
-                            else {
-                                throw new Error('Invalid string enumerator for \'type\'');
-                            }
-                        }
-                    }),
             ]
         }
         case 'delete': {

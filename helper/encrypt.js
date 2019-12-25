@@ -42,25 +42,26 @@ const decrypt = (text, key) => {
 const encryptVault = (doc, secretKey) => {
 	return new Promise(async (resolve, reject) => {
 		try {
+			const originalDoc = { ...doc };
 			let untouchedInfo = {};
-			if (doc._id) untouchedInfo._id = doc._id;
-			if (doc.createdAt) untouchedInfo.createdAt = doc.createdAt;
-			if (doc.updatedAt) untouchedInfo.updatedAt = doc.updatedAt;
-			if (doc.user) untouchedInfo.user = doc.user;
-			if (doc.folder) untouchedInfo.folder = doc.folder;
-			if (doc.type) untouchedInfo.type = doc.type;
-			delete doc._id;
-			delete doc.createdAt;
-			delete doc.updatedAt;
-			delete doc.user;
-			delete doc.folder;
-			delete doc.type;
-			delete doc.__v;
+			if (originalDoc._id) untouchedInfo._id = originalDoc._id;
+			if (originalDoc.createdAt) untouchedInfo.createdAt = originalDoc.createdAt;
+			if (originalDoc.updatedAt) untouchedInfo.updatedAt = originalDoc.updatedAt;
+			if (originalDoc.user) untouchedInfo.user = originalDoc.user;
+			if (originalDoc.folder) untouchedInfo.folder = originalDoc.folder;
+			if (originalDoc.type) untouchedInfo.type = originalDoc.type;
+			delete originalDoc._id;
+			delete originalDoc.createdAt;
+			delete originalDoc.updatedAt;
+			delete originalDoc.user;
+			delete originalDoc.folder;
+			delete originalDoc.type;
+			delete originalDoc.__v;
 
-			let encryptedDoc = { ...doc };
+			let encryptedDoc = { ...originalDoc };
 
-			const docKeys = Object.keys(doc);
-			const promiseArr = docKeys.map(field => encrypt(doc[field], secretKey) );
+			const docKeys = Object.keys(originalDoc);
+			const promiseArr = docKeys.map(field => encrypt(originalDoc[field], secretKey) );
 			const docEncryptedValues = await Promise.all(promiseArr.map(promise => promise.catch(error => console.log(error))));
 			for (let i = 0; i < docKeys.length; i++) {
 				encryptedDoc[docKeys[i]] = docEncryptedValues[i];
@@ -76,25 +77,26 @@ const encryptVault = (doc, secretKey) => {
 const decryptVault = (doc, secretKey) => {
 	return new Promise(async (resolve, reject) => {
 		try {
+			const originalDoc = { ...doc };
 			let untouchedInfo = {};
-			if (doc._id) untouchedInfo._id = doc._id;
-			if (doc.createdAt) untouchedInfo.createdAt = doc.createdAt;
-			if (doc.updatedAt) untouchedInfo.updatedAt = doc.updatedAt;
-			if (doc.user) untouchedInfo.user = doc.user;
-			if (doc.folder) untouchedInfo.folder = doc.folder;
-			if (doc.type) untouchedInfo.type = doc.type;
-			delete doc._id;
-			delete doc.createdAt;
-			delete doc.updatedAt;
-			delete doc.user;
-			delete doc.folder;
-			delete doc.type;
-			delete doc.__v;
+			if (originalDoc._id) untouchedInfo._id = originalDoc._id;
+			if (originalDoc.createdAt) untouchedInfo.createdAt = originalDoc.createdAt;
+			if (originalDoc.updatedAt) untouchedInfo.updatedAt = originalDoc.updatedAt;
+			if (originalDoc.user) untouchedInfo.user = originalDoc.user;
+			if (originalDoc.folder) untouchedInfo.folder = originalDoc.folder;
+			if (originalDoc.type) untouchedInfo.type = originalDoc.type;
+			delete originalDoc._id;
+			delete originalDoc.createdAt;
+			delete originalDoc.updatedAt;
+			delete originalDoc.user;
+			delete originalDoc.folder;
+			delete originalDoc.type;
+			delete originalDoc.__v;
 
-			let decryptedDoc = { ...doc };
+			let decryptedDoc = { ...originalDoc };
 
-			const docKeys = Object.keys(doc);
-			const promiseArr = docKeys.map(field => decrypt(doc[field], secretKey) );
+			const docKeys = Object.keys(originalDoc);
+			const promiseArr = docKeys.map(field => decrypt(originalDoc[field], secretKey) );
 			const docDecryptedValues = await Promise.all(promiseArr.map(promise => promise.catch(error => console.log(error))));
 			for (let i = 0; i < docKeys.length; i++) {
 				decryptedDoc[docKeys[i]] = docDecryptedValues[i];
