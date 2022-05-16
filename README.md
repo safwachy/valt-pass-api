@@ -41,10 +41,6 @@ PATCH /users/:id/vaults/:vaultId
 DELETE /users/:id/vaults/:vaultId
 ```
 
-If you would like to test this API yourself, you can make http requests to the following base URL:
-
-> https://valt-pass-api.herokuapp.com
-
 ## Authentication Routes
 
 ValtPass uses Twilio Authy two-factor authentication to ensure that your data stays secure.
